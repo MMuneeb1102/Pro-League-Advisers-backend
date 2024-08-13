@@ -12,7 +12,7 @@ import gameRoutes from './routes/gameRoutes.js';
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-connectToMongo();
+await connectToMongo();
 const app = express();
 const port = 5000;
 

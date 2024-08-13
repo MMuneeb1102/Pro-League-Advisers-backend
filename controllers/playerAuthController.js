@@ -40,6 +40,13 @@ const createUser = async (req, res) =>{
 
           const token = sign(data, process.env.MY_SECRET_KEY);
           console.log(token);
+
+          res.cookie('auth-token', token, {
+            httpOnly: true, // Accessible only by web server
+            maxAge: 2592000000, // Cookie expiry time in milliseconds (1 hour)
+            // sameSite: 'strict', // Protects against CSRF attacks
+          });
+          
           res.json({success: true, authtoken: token});
 
     } catch (error) {
@@ -60,12 +67,12 @@ const loginUser = async (req, res) =>{
     const user = await Player.findOne({email: email.toLowerCase()});
 
     if(!user){
-      return res.status(400).json({ error: "please enter correct details" });
+      return res.status(400).json({success: false, message: "please enter correct details" });
     }
 
     const passwordCompare = await compare(password, user.password);
     if (!passwordCompare) {
-      return res.status(400).json({ error: "please enter correct details" });
+      return res.status(400).json({success: false, message: "please enter correct details" });
     }
 
     const data = {
@@ -76,6 +83,13 @@ const loginUser = async (req, res) =>{
 
     const token = sign(data, process.env.MY_SECRET_KEY);
     console.log(token);
+
+    res.cookie('auth-token', token, {
+      httpOnly: true, // Accessible only by web server
+      maxAge: 2592000000, // Cookie expiry time in milliseconds (1 hour)
+      // sameSite: 'strict', // Protects against CSRF attacks
+    });
+
     res.json({ success: true, authtoken: token });
 
   } catch(error){
@@ -84,20 +98,28 @@ const loginUser = async (req, res) =>{
   }
 }
 
-// const getUser = async (req, res) =>{
-//   try {
-//     const { user } = req;
+const getUser = async (req, res) =>{
+  try {
+    const { user } = req;
 
-//       if(!user){
-//           return res.status(401).json({ success: false, message: 'User not authenticated' });
-//       }
+      if(!user){
+          return res.status(401).json({ success: false, message: 'User not authenticated' });
+      }
 
-//       const player = await Player.findOne({})
+      const userId = req.user.id; 
 
+      const player = await Player.findById(userId).select("-password");
 
-//   } catch (error) {
+      if (player._id.toString() !== req.user.id) {
+        return res.status(401).json({success: false, message: "Player not authorized" });
+      }
 
-//   }
-// }
+      res.json(player)
 
-export default {createUser, loginUser};
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("Internal Error Occured");
+  }
+}
+
+export default {createUser, loginUser, getUser};
