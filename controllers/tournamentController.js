@@ -12,13 +12,14 @@ const createTournament = async (req, res) =>{
             return res.status(401).json({ success: false, message: 'User not authenticated' });
         }
 
-        const {tournamentName, description, startDate, endDate, tournamentType, requiredContenders, game } = req.body;
+        const {tournamentName, description, platform, startDate, endDate, tournamentType, requiredContenders, game } = req.body;
 
         const newTour = await Tournament.create({
             tournamentName: tournamentName,
             tournamentType: tournamentType,
             requiredContenders: requiredContenders,
             description: description,
+            platform: platform,
             startDate: startDate,
             endDate: endDate,
             joining: true,
@@ -219,4 +220,30 @@ async function getTournamentDetails(req, res) {
     }
 }
 
-export default { createTournament, joinTournament, getTournamentDetails };
+const getAllTournaments = async (req, res) =>{
+    try {
+        const tournaments = await Tournament.find();
+        res.status(200).json(tournaments)
+
+    } catch (error) {
+        res.status(500).send('Server error');
+    }
+}
+
+const getPlayerTournament = async (req, res) =>{
+    try {
+        const {user} = req;
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'User not authenticated' });
+        }
+        
+        const tournament = await Tournament.findOne({ 'participants.player': user.id });
+        res.status(200).json(tournament)
+
+    } catch (error) {
+        res.status(500).send('Server error');
+    }
+}
+
+export default { createTournament, joinTournament, getTournamentDetails, getAllTournaments, getPlayerTournament };

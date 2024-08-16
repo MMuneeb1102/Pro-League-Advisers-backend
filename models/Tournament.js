@@ -25,6 +25,11 @@ const tournamentSchema = new Schema({
         type: String
     },
 
+    platform: {
+        type: String,
+        required: true
+    },
+
     startDate: {
         type: Date,
         required: true

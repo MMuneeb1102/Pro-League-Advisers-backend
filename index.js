@@ -35,7 +35,7 @@ app.use('/api/auth', playerRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/match', matchRoutes);
 
-app.use('/api/admin/tournament', tournamentRoutes);
+app.use('/api/tournament', tournamentRoutes);
 app.use('/api/admin/category', categoryRoutes);
 app.use('/api/admin/game', gameRoutes);
 
