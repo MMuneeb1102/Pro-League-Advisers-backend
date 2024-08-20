@@ -3,6 +3,8 @@ import Player from '../models/Player.js';
 import Match from '../models/Match.js';
 import matchController from '../controllers/matchController.js';
 const { findOpponentForMatch, createMatch } = matchController;
+import schedule from 'node-schedule';
+import { updateStatus } from '../jobs/TournamentSchedule.js';
 
 const createTournament = async (req, res) =>{
     try{
@@ -51,7 +53,7 @@ const createTournament = async (req, res) =>{
                 );
             }
         }
-        
+          schedule.scheduleJob(startDate, () => updateStatus(newTour._id));
           res.status(201).json({success: true, message: "Tournament created successfully!!"});
           
         } catch(error){

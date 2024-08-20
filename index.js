@@ -42,4 +42,5 @@ app.use('/api/admin/game', gameRoutes);
 
 httpServer.listen(port, () =>{
     console.log(`Pro League Advisers running on ${port}`)
+    console.log(new Date())
 })
